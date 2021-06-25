@@ -1,0 +1,701 @@
+var blankArray = new Array();
+var Series = "VisitorRegNo";
+var Status = [
+    { Name: "ALL", value: "0" },
+    { Name: "IN", value: "1" },
+    { Name: "OUT", value: "2" }
+];
+
+$(document).ready(function() {
+    Init();
+});
+
+function Init() {
+    debugger;
+    butionHideShow(1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+    butEnableDisable(1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+    $("#Step1").show();
+    $("#Step2").hide();
+    $("#imageviewParent").hide();
+
+    $("#uxFromDate").kendoDatePicker({
+        format: "{0:dd/MM/yyyy}",
+        value: new Date(),
+        change: function() {
+            BindVisitorList(blankArray);
+        }
+
+    });
+    mask("#uxFromDate");
+
+    $("#uxToDate").kendoDatePicker({
+        format: "{0:dd/MM/yyyy}",
+        value: new Date()
+
+    });
+    mask("#uxToDate");
+
+    $("#uxVisitDate").kendoDatePicker({
+        format: "{0:dd/MM/yyyy}",
+        min: new Date(),
+        value: new Date()
+
+    });
+    mask("#uxVisitDate");
+
+    $("#uxStatus").kendoDropDownList({
+        dataValueField: "value",
+        dataTextField: "Name",
+        dataSource: Status
+    });
+
+    $("#uxStatus").data("kendoDropDownList").select(1);
+
+    $("#uxInTime").kendoTimePicker({
+        max: new Date(2016, 0, 1, 24, 0, 0),
+        interval: 15,
+        change: function() {
+            debugger;
+
+            if ($("#uxInTime").val() != "") {
+                var date = $("#uxInTime").data("kendoTimePicker").value();
+                if (date) {
+
+                    $("#uxOutTime").data("kendoTimePicker").min(new Date(2016, 0, 1, 24, 0, 0));
+                    //convert the string to a date
+                    date = new Date(date); //you can probably skip this step since the Kendo DatePicker returns a Date object
+                    //increase the "hours"                               
+                    date.setHours(date.getHours()); // + 1);
+                    //set it back in the "to" date picker
+                    $("#uxOutTime").data("kendoTimePicker").value(date);
+                    $("#uxOutTime").data("kendoTimePicker").min(date);
+                    //alert(endTime.value());
+                    $("#uxTotalTime").text("");
+                    if ($("#uxInTime").val() != "") {
+                        var diff = Math.abs(new Date($("#uxOutTime").data("kendoTimePicker").value()) - new Date($("#uxInTime").data("kendoTimePicker").value()));
+                        var seconds = Math.floor(diff / 1000); //ignore any left over units smaller than a second
+                        var minutes = Math.floor(seconds / 60);
+                        seconds = seconds % 60;
+                        var hours = Math.floor(minutes / 60);
+                        minutes = minutes % 60;
+                        $("#uxTotalTime").text(hours + ":" + minutes + " Hours");
+                    }
+                }
+            }
+        }
+    });
+
+    $("#uxOutTime").kendoTimePicker({
+        max: new Date(2016, 0, 1, 24, 0, 0),
+        change: function() {
+            $("#uxTotalTime").text("");
+            if ($("#uxInTime").val() != "") {
+                var diff = Math.abs(new Date($("#uxOutTime").data("kendoTimePicker").value()) - new Date($("#uxInTime").data("kendoTimePicker").value()));
+                var seconds = Math.floor(diff / 1000); //ignore any left over units smaller than a second
+                var minutes = Math.floor(seconds / 60);
+                seconds = seconds % 60;
+                var hours = Math.floor(minutes / 60);
+                minutes = minutes % 60;
+                $("#uxTotalTime").text(hours + ":" + minutes + " Hours");
+            }
+        }
+    });
+
+    $("#uxSave").click(function() {
+        debugger;
+        var isInsert = true;
+        RequireField("uxName,uxMeetPerson,uxContactNo,uxVisitDate", "ulName,ulMeetPerson,ulContactNo,ulVisitDate", function(val) {
+            if (val == true) {
+                debugger;
+                if ($("#uxRegNo").val().length > 0) {
+                    var Condition = "regno=$" + $("#uxRegNo").val() + "$";
+                    if ($("#hndVisitorId").val().trim().length > 0) {
+                        Condition = Condition + " and pkid <> " + $("#hndVisitorId").val();
+                    }
+                    CheckDuplicateRecord("VisitorMaster", Condition, "instid,sessionid", function(val) {
+                        if (val == true) {
+                            debugger;
+                            isInsert = false;
+                            ShowInLineMsg("Visitor with Same Reg. No Already Exists", 'uxRegNo');
+                            $("#uxRegNo").focus();
+                        }
+                        else {
+                            InsertUpdateVisitor();
+                        }
+                    });
+                }
+
+            }
+
+        });
+    });
+
+
+    $("#uxNew").click(function() {
+        ClearData();
+    });
+
+    $("#uxBack").click(function() {
+        debugger;
+        $("#Step1").show();
+        $("#Step2").hide();
+        ClearData();
+        getVisitorList();
+    });
+
+    $("#uxViewVisitor").click(function() {
+        RequireField("uxFromDate", "ulFromDate", function(val) {
+            if (val == true) {
+                getVisitorList();
+            }
+
+        });
+    });
+
+    $(".VisitTime").hide();
+    getVisitorList();
+    BindVisitorList(blankArray);
+
+    $("#uxNoOfPerson").val("1");
+
+    $("#uxMeetPerson").kendoAutoComplete({
+        dataTextField: "mastervalue",
+        dataValueField: "mastervalue",
+        dataSource: blankArray,
+        filter: "contains"
+    });
+    //$("#").kendoAutoC
+
+    GetMaxSeriesValue(Series, "", function(jVal) {
+        if (jVal.length > 0)
+            $("#uxRegNo").val(jVal[0].seriesno);
+        else
+            $("#uxRegNo").val("");
+
+    });
+
+    $("#uxRegNo").prop("disabled", true).addClass("k-state-disabled");
+
+
+} //Init END
+
+
+
+function take_snapshot() {
+    $("#imageviewParent").show();
+    $("#imageParent").hide();
+    Webcam.snap(function(data_uri) {
+        document.getElementById('uxWebPhoto').innerHTML = '<img src="' + data_uri + '"  style="width: 150px; height: 180px" id="uxVisitorPhoto"/>';
+    });
+    // Webcam.off()
+}
+
+function ClearData() {
+    debugger;
+
+    $(".Info").val("");
+    $(".VisitTime").hide();
+    $("input[type='hidden']").val("");
+    $("#uxSave").html('<span class="k-icon k-i-plus"></span> Save');
+
+    $("#uxLInTime").text("");
+    $("#uxLOutTime").text("");
+    $("#uxDuration").html("");
+
+    $("#uxNoOfPerson").val("1");
+
+    $("#uxVisitDate").data("kendoDatePicker").value(new Date());
+    $("#uxTotalTime").text("");
+    $("#uxfilename").val("");
+    $("#imgPhoto").attr("src", "");
+    $("#imageuploader .k-upload-files").remove();
+    $("#imageuploader div:eq(0)").addClass("k-upload-empty");
+    $(".k-upload-status.k-upload-status-total").remove();
+
+    $("#uxRemark").prop("disabled", false).removeClass("k-state-disabled");
+    $("#uxContactNo").prop("disabled", false).removeClass("k-state-disabled");
+    $("#uxNoOfPerson").prop("disabled", false).removeClass("k-state-disabled");
+    $('#uxVisitDate').data('kendoDatePicker').enable(true);
+
+    GetMaxSeriesValue(Series, "", function(jVal) {
+        if (jVal.length > 0)
+            $("#uxRegNo").val(jVal[0].seriesno);
+        else
+            $("#uxRegNo").val("");
+
+    });
+
+    $("#uxStatus").data("kendoDropDownList").select(1);
+
+    $("#imageviewParent").hide();
+    $("#imageParent").show();
+    document.getElementById('uxWebPhoto').innerHTML = "";
+    $("#uxmy_cameraparent").html('<div id="uxmy_camera" style="width: 320px; height: 240px"></div>');
+    Webcam.set({
+        width: 320,
+        height: 240
+    });
+    Webcam.attach('#uxmy_camera');
+
+    $("#uxMeetPerson").data("kendoAutoComplete").value([]);
+}
+
+
+
+
+
+function BindVisitorList(JData) {
+    debugger;
+
+
+    var _dsVisitor = new kendo.data.DataSource({
+        transport: {
+            read: function(options) {
+                options.success(JData);
+            },
+            update: function(options) {
+
+            },
+            destroy: function(options) {
+
+            },
+            parameterMap: function(options, operation) {
+                if (operation !== "read" && options.models) {
+                    return { models: kendo.stringify(options.models) };
+                }
+            }
+        },
+        batch: true,
+        schema: {
+            model: {
+                id: "pkid",
+                fields: {
+                    pkid: { type: "number", editable: false },
+                    regno: { type: "string", editable: false },
+                    name: { type: "string", editable: false },
+                    dov: { type: "string", editable: false },
+                    intime: { type: "string", editable: false },
+                    outtime: { type: "string", editable: false },
+                    persontomeet: { type: "string", editable: true },
+                    reason: { type: "string", editable: true },
+                    remark: { type: "string", editable: false },
+                    duration: { type: "string", editable: false },
+                    photo: { type: "string", editable: false },
+                    statusclass: { type: "string", editable: false },
+                    pointer: { type: "string", editable: false },
+                    contactno: { type: "string", editable: false },
+                    noofperson: { type: "string", editable: false },
+                    statuscolor: { type: "string", editable: false },
+                    status: { type: "string", editable: false },
+                    photo: { type: "string", editable: false }
+
+                }
+            }
+        }
+
+    });
+
+    $("#uxVisitorListParent").html("<div id='uxVisitorList' style=''></div>");
+    $("#uxVisitorList").kendoGrid({
+        dataSource: _dsVisitor,
+        height: "480px",
+        pageable: false,
+        editable: false,
+        navigatable: true,
+        scrollable: true,
+        selectable: "single",
+        toolbar: [
+                    {
+                        template: '<a class="k-button " href="\\#" onclick="return AddVisitor(this)"> <span class="k-icon k-i-plus"> </span> Add New</a>'
+                    }
+                ],
+        columns: [
+
+         {
+             field: "",
+             title: "",
+             width: "150px",
+             template: "<span style='font-size: 20px;color:${statuscolor};cursor:${pointer};margin-right: 10px;' data-toggle='tooltip' title='Check Out' class='${statusclass}'id=${pkid} onclick='OnChangeVisitor(this)' data-status=${status} ></span>  <span id=${pkid} style='cursor:pointer;font-size: 20px;margin-right: 10px;' class='fa fa-pencil-square-o' data-toggle='tooltip' title='Edit' id=${pkid} onclick='OnEditVisitor(this)' ></span><span id=${pkid} style='cursor:pointer;font-size: 20px;margin-right: 10px;' class='fa fa-trash' data-toggle='tooltip' title='Delete' id=${pkid} onclick='OnDeletVisitor(this)' ></span><span id=${pkid} style='cursor:pointer;font-size: 20px;margin-right: 10px;' class='fa fa-print' data-toggle='tooltip' title='Print' id=${pkid} onclick='OnPrintVisitor(this)' ></span> ",
+             attributes: { style: "text-align: center;" },
+             hidden: false
+         },
+         {
+             field: "photo",
+             title: "",
+             width: "100px",
+             template: "<img src=${photo}?" + Math.random() + " style='cursor:pointer;width:70px;height:70px;border-radius: 50%;border: 2px solid black;' data-id=${pkid} onclick='onZoomOut(this)' ></span> ",
+             attributes: { style: "text-align: center;" },
+             hidden: false
+         },
+         {
+             field: "regno",
+             title: "Reg.No",
+             width: "90px",
+             hidden: false
+
+         },
+         {
+             field: "name",
+             title: "Name",
+             width: "180px",
+             hidden: false
+
+         },
+         {
+             field: "contactno",
+             title: "Contact No",
+             width: "90px",
+             hidden: false
+
+         },
+          {
+              field: "dov",
+              title: "Date of Visit",
+              width: "80px",
+              hidden: false
+          },
+          {
+              field: "intime",
+              title: "In Time",
+              width: "70px",
+              hidden: false
+          },
+          {
+              field: "outtime",
+              title: "Out Time",
+              width: "70px",
+              hidden: false
+          },
+          {
+              field: "duration",
+              title: "Duration",
+              width: "70px",
+              hidden: false
+          },
+          {
+              field: "persontomeet",
+              title: "To Visit",
+              width: "120px",
+              hidden: false
+          },
+          {
+              field: "noofperson",
+              title: "No. Of Person",
+              width: "60px",
+              hidden: false
+          },
+          {
+              field: "reason",
+              title: "Purpose Of Visit",
+              width: "150px",
+              hidden: false
+          },
+          {
+              field: "remark",
+              title: "Remark",
+              width: "120px",
+              hidden: true
+
+}]
+    });
+
+    $("#uxVisitorList .k-grid-header tr").find("th:eq(1)").html("");
+}
+
+function onZoomOut(CName) {
+    $("#uxVisitorList tr").removeClass("k-state-selected");
+    $(CName).parent().parent().addClass("k-state-selected");
+
+    var grid = $("#uxVisitorList").data("kendoGrid");
+    var dataItem = grid.dataItem(grid.tbody.find(">tr.k-state-selected"));
+
+    var src = $(CName).attr("src");
+    
+    var str = "<div id='uxDataDisplayPopup' style='width:300px;height:340px;'>" +
+        "<div style='width:100%;height:30px;float:left'><H2 style='float:left;    color: #000000;'>" + dataItem.name + "</H2><i class='fa fa-times' style='float:right;cursor:pointer;    font-size: 20px;' onclick='OnCloseZoomPopup()'/></div><hr style='width:100%' />" +
+        "<div style='width:285px;height:240px;background:url(" + src + ") no-repeat center;'></div>" +
+        "<div style='width:100%;height:30px;margin-top:15px; font-size: 18px;'><i class='fa fa-clock' style='float:right;cursor:pointer;    font-size: 18px;' /><H3 style='color: #000000; font-size: 20px;font-weight:bold'> In At : " + dataItem.intime + "</H3></div></div>"; 
+                
+    $("#uxDataPopup").html(str);
+    var window = $("#uxDataDisplayPopup");
+    if (!window.data("kendoWindow")) {
+        window.kendoWindow({
+            width: "300px",
+            title: false,
+            modal: true,
+            resizable: false,
+            deactivate: function(e) {
+                this.destroy();
+            }
+        });
+        $(document).scrollTop(0);
+        $("#uxDataDisplayPopup").closest(".k-window").css({ top: "90px" });
+        $("#uxDataDisplayPopup").closest(".k-window").css({ left: "35%" });
+    }
+}
+
+
+function OnCloseZoomPopup() {
+    $("#uxDataDisplayPopup").data("kendoWindow").close();
+}
+function OnPrintVisitor(CName) {
+    var visitorid = parseInt($(CName).attr("id"));
+    GetVisitorForPrint(visitorid, 0);
+}
+
+
+
+function AddVisitor(CName) {
+    debugger;
+    $("#Step1").hide();
+    $("#Step2").show();
+    $("#uxmy_cameraparent").html('<div id="uxmy_camera" style="width: 320px; height: 240px"></div>');
+    Webcam.set({
+        width: 320,
+        height: 240
+    });
+    Webcam.attach('#uxmy_camera');
+
+}
+
+function OnChangeVisitor(CName) {
+    debugger;
+    var statuscode = parseInt($(CName).attr("data-status"));
+    if (statuscode == 0) {
+        var pkid = parseInt($(CName).attr("id"));
+        changeVisitorStatus(pkid);
+    }
+
+}
+
+function OnEditVisitor(CName) {
+    debugger;
+    $("#uxSave").html('<span class="k-icon k-i-plus"></span> Update');
+    var pkid = parseInt($(CName).attr("id"));
+    $("#Step1").hide();
+    $("#Step2").show();
+    getVisitorDetails(pkid);
+
+}
+
+
+function getVisitorDetails(pkid) {
+    debugger;
+
+    ajaxPost("ws_Institution.asmx/getVisitorDetail"
+            , "{Pkid: " + pkid + "}"
+    , function(value) {
+        debugger;
+        var json = eval('(' + value.d + ')');
+        if (json.length > 0) {
+            if (json[0].table.length > 0)
+                AssignDateToControl(json[0].table);
+        }
+
+    }, function(errorText) {
+
+    });
+
+}
+
+function changeVisitorStatus(pkid) {
+    debugger;
+    ajaxPost("ws_Institution.asmx/changeVisitorStatus"
+            , "{Pkid: " + pkid + "}"
+    , function(value) {
+        debugger;
+        var json = value.d;
+        if (json.length > 0)
+        {
+            OpenUserDefineMsgBox("success", "Visitor is Out at <b style='font-size:17px;color:red'>" + json + " </b>", function(val) {
+                if (val == true) {
+                    getVisitorList();
+                }
+            });
+        }
+
+    }, function(errorText) {
+
+    });
+
+}
+
+
+function InsertUpdateVisitor() {
+    debugger;
+    var photo = "";
+    var model = {};
+    if ($("#hndVisitorId").val() > 0) {
+        model["pkid"] = $("#hndVisitorId").val();
+
+    }
+    else {
+        model["pkid"] = null;
+
+    }
+    if ($("#uxVisitorPhoto").attr("src") != undefined)
+        photo = $("#uxVisitorPhoto").attr("src").replace("data:image/jpeg;base64,", "");
+    model["regno"] = $("#uxRegNo").val();
+    model["name"] = $("#uxName").val();
+    model["persontomeet"] = $("#uxMeetPerson").val();
+    model["visitdate"] = GetSqlDateformat($("#uxVisitDate").val());
+    model["reason"] = $("#uxReason").val();
+    model["remark"] = $("#uxRemark").val();
+    model["contactno"] = $("#uxContactNo").val();
+    model["noofperson"] = $("#uxNoOfPerson").val();
+
+
+    ajaxPost("ws_Institution.asmx/InsertUpdateVisitor"
+            , "{VM: " + JSON.stringify(model) + ",photobyte:'" + photo + "'}"
+    , function(value) {
+        debugger;
+        var json = value.d;
+        if ($("#uxSave").text().trim() == "Save") {
+            OpenUserDefineMsgBox("success", "Record saved successfully", function(val) {
+                if (val == true) {
+                    GetVisitorForPrint(value.d, 1);
+                }
+            });
+        }
+        else {
+            OpenUserDefineMsgBox("success", "Record updated successfully", function(val) {
+                if (val == true) {
+
+                }
+            });
+        }
+        ClearData();
+
+    }, function(errorText) {
+
+    });
+}
+
+
+function getVisitorList() {
+    var FrmDate = GetSqlDateformat($("#uxFromDate").val());
+    var ToDate = GetSqlDateformat($("#uxFromDate").val());
+    var vstatus = parseInt($("#uxStatus").data("kendoDropDownList").value());
+
+
+    ajaxPost("ws_Institution.asmx/getVisitorList"
+            , "{FrmDate: '" + FrmDate + "',ToDate:'" + ToDate + "',Status:" + vstatus + "}"
+    , function(value) {
+        debugger;
+        var json = eval('(' + value.d + ')');
+        if (json[0].table.length > 0) {
+            BindVisitorList(json[0].table);
+            
+            
+        }
+        else {
+            BindVisitorList(blankArray);
+        }
+        $("#uxMeetPerson").data("kendoAutoComplete").setDataSource(json[1].table1);
+
+    }, function(errorText) {
+
+    });
+
+}
+
+function AssignDateToControl(jdata) {
+    debugger;
+    $(".VisitTime").show();
+    $("#hndVisitorId").val(jdata[0].pkid);
+    $("#uxRegNo").val(jdata[0].regno);
+    $("#uxName").val(jdata[0].name);
+    $("#uxContactNo").val(jdata[0].contactno);
+    $("#uxNoOfPerson").val(jdata[0].noofperson);
+
+    $("#uxMeetPerson").val(jdata[0].persontomeet);
+    $("#uxLInTime").text(jdata[0].intime);
+
+    if (jdata[0].outtime != null)
+        $("#uxLOutTime").text(jdata[0].outtime);
+
+    if (jdata[0].duration != null)
+        $("#uxTotalTime").text(jdata[0].duration + " hrs");
+
+    $("#uxVisitDate").val(jdata[0].visitdate);
+
+    $("#uxReason").val(jdata[0].reason);
+    $("#uxRemark").val(jdata[0].remark);
+
+    $("#uxRemark").prop("disabled", true).addClass("k-state-disabled");
+    $("#uxContactNo").prop("disabled", true).addClass("k-state-disabled");
+    $("#uxNoOfPerson").prop("disabled", true).addClass("k-state-disabled");
+    $('#uxVisitDate').data('kendoDatePicker').enable(false);
+
+    $("#imageviewParent").show();
+    $("#imageParent").hide();
+    var data_uri = jdata[0].photo;
+    document.getElementById('uxWebPhoto').innerHTML = '<img src="' + data_uri + '"  style="width: 150px; height: 180px" id="uxVisitorPhoto"/>';
+}
+
+
+function GetVisitorForPrint(pkid, ToClear) {
+    try {
+        ajaxPost("ws_Institution.asmx/GetVisitorForPrint"
+                    , "{PkID:'" + pkid + "'}"
+                    , function(value) {
+                        debugger;
+                        if (value.d == "true") {
+                            OpenRpt();
+                            if (ToClear == 1)
+                                ClearData();
+                        }
+                    }
+                    , function(errorText) {
+                    }
+            );
+    }
+    catch (Error) { }
+}
+
+function OpenRpt() {
+    var app_path = window.location.href.substr(0, window.location.href.lastIndexOf("/"));
+    //app_path = app_path.replace("Admin", "");
+    app_path = app_path.substring(0, app_path.lastIndexOf("/"));
+    var RetVal = window.open(app_path + "/ReportViewer.aspx?RptType=VisitorReport", '_blank');
+    if (RetVal == 'close') {
+
+    }
+}
+
+function removeimage() {
+
+    $("#imageviewParent").hide();
+    $("#imageParent").show();
+    document.getElementById('uxWebPhoto').innerHTML = "";
+    $("#uxmy_cameraparent").html('<div id="uxmy_camera" style="width: 320px; height: 240px"></div>');
+    Webcam.set({
+        width: 320,
+        height: 240
+    });
+    Webcam.attach('#uxmy_camera');
+}
+
+function OnDeletVisitor(CNames) {
+    OpenUserDefineMsgBox("confirmation", "Do you want to delete selected record.", function(val) {
+        if (val == true) {
+            var VID = $(CNames).attr("id");
+            ajaxPost("ws_Institution.asmx/DeletVisitor"
+            , "{Pkid: " + VID + "}"
+            , function(value) {
+                debugger;
+                var json = eval('(' + value.d + ')');
+                if (json == "true") {
+                    OpenUserDefineMsgBox("success", "Record deleted successfully", function(val) {
+                        if (val == true) {
+                            getVisitorList();
+                        }
+                    });
+                }
+
+            }, function(errorText) {
+
+            });
+        }
+    });
+}

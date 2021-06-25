@@ -1,0 +1,266 @@
+﻿<!doctype html>
+<html class="no-js " lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <meta name="description" content="Karate App admin panel">
+    <title>..:: END-VT App ::..</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon"> <!-- Favicon-->
+    <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/plugins/fullcalendar/fullcalendar.min.css">
+
+
+
+    <link href="assets/plugins/bootstrap-select/css/bootstrap-select.css" rel="stylesheet" />
+    <!-- JQuery DataTable Css -->
+
+    <link rel="stylesheet" href="assets/plugins/jquery-datatable/dataTables.bootstrap4.min.css">
+
+    <!-- Multiselect -->
+    <link rel="stylesheet" href="assets/plugins/bootstrap-select/css/bootstrap-select.css" />
+    <link rel="stylesheet" href="assets/plugins/nouislider/nouislider.min.css" />
+    <link rel="stylesheet" href="assets/plugins/select2/select2.css" />
+    <link href="css/data-picker.css" rel="stylesheet" />
+    <!-- Multiselect -->
+    <!-- Custom Css -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/color_skins.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="alertifyjs/css/alertify.min.css" rel="stylesheet" />
+    <link href="alertifyjs/css/themes/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet" />
+
+    <style>
+        .table.table-striped.table-bordered.table-condensed .row-selected {
+            background: #8c99e0;
+            color: #FFFFFF;
+        }
+
+            .table.table-striped.table-bordered.table-condensed .row-selected .fa {
+                color: #FFFFFF;
+            }
+
+        .hidepicker {
+            display: none !important;
+        }
+    </style>
+
+
+</head>
+<body class="theme-purple">
+    <!-- Page Loader -->
+    <div class="page-loader-wrapper">
+        <div class="loader">
+            <div class="m-t-30">
+                <!-- <img class="zmdi-hc-spin" src="https://thememakker.com/templates/oreo/html/assets/images/logo.svg" width="48" height="48" alt="Oreo"> -->
+            </div>
+            <p>Please wait...</p>
+        </div>
+    </div>
+    <!-- Overlay For Sidebars -->
+    <div class="overlay"></div>
+
+    <!-- Top Bar -->
+    <nav class="navbar p-l-5 p-r-5">
+        <ul class="nav navbar-nav navbar-left">
+            <li>
+                <div class="navbar-header">
+                    <a href="javascript:void(0);" class="bars"></a>
+                </div>
+            </li>
+            <li><a href="javascript:void(0);" class="ls-toggle-btn" data-close="true"><i class="zmdi zmdi-swap"></i></a></li>
+            <li class="float-right">
+                <a href="#" class="mega-menu" data-close="true" onclick="onlogout()"><i class="zmdi zmdi-power"></i></a>
+
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Left Sidebar -->
+    <aside id="leftsidebar" class="sidebar">
+
+        <div class="tab-content">
+            <div class="tab-pane stretchRight active" id="dashboard">
+                <div class="menu">
+                    <ul class="list">
+                        <li style="margin: 15px;">
+                            <div class="user-info">
+                                <div class="detail">
+                                    <h4>END-VT App</h4>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="bb active"><a href="admin.html"> <i class="material-icons">supervised_user_circle</i><span>Customer Registration</span> </a>  </li>
+                        <li class="bb active"><a href="pruchaseinformation.html"> <i class="material-icons">supervised_user_circle</i><span>Purchase Information</span> </a>  </li>
+
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <section class="content home">
+        <div class="block-header">
+            <div class="row">
+                <div class="col-lg-5 col-md-5 col-sm-12">
+                    <h2>Customer Registration  </h2>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="wrapper">
+                <div class="row clearfix">
+                    <div class="col-sm-12">
+                        <div class="card">
+                            <div class="body">
+
+                                <button type="button" class="btn btn-primary btn-round waves-effect float-right " id="uxaddcustomer"
+                                        data-dismiss="modal">
+                                    Add Customer
+                                </button>
+
+                                <div class="row step1 m-t-30" style="display:none;">
+                                    <div class="col-lg-12">
+                                        <div class="table-responsive">
+                                            <table class="display table table-bordered table-striped" id="uxcustomerlist" style="width:99%"></table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row step2 m-t-30">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label>Name <span style="color: #FF0000;margin-left:5px" id="classspan">*</span></label>
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control studreq" id="uxcustomername" />
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-6">
+                                                <label>Company Name <span style="color: #FF0000;margin-left:5px" id="classspan">*</span></label>
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control studreq" id="uxcompanyname" />
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label>Email <span style="color: #FF0000;margin-left:5px" id="classspan" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="email address is not in proper format">*</span></label>
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control studreq" id="uxemail" />
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-6">
+                                                <label>Mobile Number <span style="color: #FF0000;margin-left:5px" id="classspan">*</span></label>
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control studreq" id="uxmobileno" title="Phone number with 7-9 and remaing 9 digit with 0-9" pattern="[7-9]{1}[0-9]{9}" />
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="row">
+
+                                            <div class="col-lg-6">
+                                                <label id="ulpassword">Password <span style="color: #FF0000;margin-left:5px" id="classspan">*</span></label>
+                                                <div class="form-group">
+                                                    <input type="password" class="form-control studreq" id="uxpassword" />
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-6">
+                                                <label id="ulconfrim">Confrim Password <span style="color: #FF0000;margin-left:5px" id="classspan">*</span></label>
+                                                <div class="form-group">
+                                                    <input type="password" class="form-control studreq" id="uxconfrim" />
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-3">
+                                                <label id="ulstatus">Status<span style="color: #FF0000;margin-left:5px" id="classspan">*</span></label>
+                                                <select id="uxstatus" class="form-control">
+                                                    <option value="1">
+                                                        Active
+                                                    </option>
+                                                    <option value="0">
+                                                        Blocked
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="modal-default m-t-30" style="text-align:center;">
+                                            <button type="button" class="btn btn-success btn-round waves-effect" id="uxsave">
+                                                Save
+                                            </button>
+
+                                            <button type="button" class="btn btn-success btn-round waves-effect" id="uxupdate">
+                                                Update
+                                            </button>
+
+                                            <button type="button" class="btn btn-danger btn-round waves-effect" id="uxclear"
+                                                    data-dismiss="modal">
+                                                Clear
+                                            </button>
+
+                                            <button type="button" class="btn btn-Info btn-round waves-effect" id="uxback"
+                                                    data-dismiss="modal ">
+                                                Back
+                                            </button>
+                                            <input type="hidden" id="uxcustid" />
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+    </section>
+
+    <!-- Add EVent Popup -->
+    <!-- Jquery Core Js -->
+    <script src="assets/bundles/libscripts.bundle.js"></script>
+    <script src="assets/bundles/vendorscripts.bundle.js"></script>
+
+    <script src="assets/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.js"></script>
+    <script src="assets/plugins/jquery-inputmask/jquery.inputmask.bundle.js"></script>
+    <script src="assets/plugins/multi-select/js/jquery.multi-select.js"></script>
+    <script src="assets/plugins/jquery-spinner/js/jquery.spinner.js"></script>
+    <script src="assets/plugins/bootstrap-tagsinput/bootstrap-tagsinput.js"></script>
+    <script src="assets/plugins/nouislider/nouislider.js"></script>
+    <script src="assets/plugins/select2/select2.min.js"></script>
+
+    <!-- Datatble -->
+    <script src="assets/bundles/datatablescripts.bundle.js"></script>
+    <script src="assets/js/pages/forms/advanced-form-elements.js"></script>
+    <script src="assets/plugins/jquery-datatable/buttons/dataTables.buttons.min.js"></script>
+    <script src="assets/plugins/jquery-datatable/buttons/buttons.bootstrap4.min.js"></script>
+    <script src="assets/plugins/jquery-datatable/buttons/buttons.colVis.min.js"></script>
+    <script src="assets/plugins/jquery-datatable/buttons/buttons.html5.min.js"></script>
+    <script src="assets/plugins/jquery-datatable/buttons/buttons.print.min.js"></script>
+    <!-- Datatble -->
+    <script src="assets/bundles/fullcalendarscripts.bundle.js"></script>
+
+    <script src="assets/bundles/mainscripts.bundle.js"></script>
+    <script src="alertifyjs/alertify.min.js"></script>
+
+
+
+    <script src="js/common.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

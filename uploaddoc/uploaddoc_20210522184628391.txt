@@ -1,0 +1,414 @@
+<%@ Page Language="C#" MasterPageFile="~/KridaSankul.master" AutoEventWireup="true"
+    CodeFile="LedgerAccount_Mst.aspx.cs" Inherits="LedgerAccount_Mst" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
+<%@ Register Assembly="TimePicker" Namespace="MKB.TimePicker" TagPrefix="MKB" %>
+<%@ Register TagPrefix="Atxt" TagName="AutoTxt" Src="AutoCTextBox.ascx" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+    <link href="Style/tabs.css" rel="stylesheet" type="text/css" />
+    <link href="JQTextBoxAutoC/jquery-ui.css" rel="stylesheet" type="text/css" />
+    <script src="JQTextBoxAutoC/jquery.min.js" type="text/javascript"></script>
+    <script src="JQTextBoxAutoC/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="JQTextBoxAutoC/jsTextBoxAutoC.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+        var prm = Sys.WebForms.PageRequestManager.getInstance();
+        if (prm != null) {
+            prm.add_endRequest(function (sender, e) {
+                if (sender._postBackSettings.panelsToUpdate != null) {
+                    InIEvent();
+                }
+            });
+        };
+
+        $(document).ready(function () {
+
+            Sys.WebForms.PageRequestManager.getInstance().add_endRequest(EndRequestHandler);
+            Sys.WebForms.PageRequestManager.getInstance().beginAsyncPostBack();
+            function EndRequestHandler(sender, args) {
+
+            }
+
+
+            pageLoad();
+
+        });
+
+        function pageLoad() {
+            $(function () {
+
+            });
+        }
+        function InIEvent() {
+        }
+       
+       
+    </script>
+    <style type="text/css">
+        .popup
+        {
+            overflow: auto;
+            height: 500px;
+        }
+        .popupstationgrid
+        {
+            overflow: auto;
+            height: 300px;
+        }
+        .gvPagerCss span
+        {
+            background-color: #DEE1E7;
+            font-size: 20px;
+        }
+        .gvPagerCss td
+        {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+    </style>
+    <asp:Panel ID="pnlFind" runat="server" BackColor="#CCFFFF" Height="100px" Width="400px"
+        Style="display: none">
+        <table width="100%" style="border: Solid 2px #D46900; width: 100%; height: 100%"
+            cellpadding="0" cellspacing="0" backcolor="#CCFFFF">
+            <tr style="background-image: url(Images/header.gif)">
+                <td style="color: #FF0000; font-weight: bold; padding: 3px; font-size: larger;" align="Left">
+                    Search Record
+                </td>
+                <td style="color: White; font-weight: bold; padding: 3px; font-size: larger" align="Right">
+                </td>
+            </tr>
+            <tr>
+                <td align="left" style="padding: 5px; font-family: Calibri">
+                    <asp:UpdatePanel ID="UpdatePanel31" runat="server">
+                        <ContentTemplate>
+                            <asp:Label ID="lblfindmsg" runat="server" Font-Bold="True" ForeColor="Red" Visible="False"></asp:Label>
+                        </ContentTemplate>
+                    </asp:UpdatePanel>
+                </td>
+            </tr>
+            <tr style="background-color: #CCFFFF">
+                <td align="left" style="padding: 5px; font-family: Calibri">
+                    
+                </td>
+                <td align="left" style="padding: 5px; font-family: Calibri">
+                    <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                        <ContentTemplate>
+                            <Atxt:AutoTxt runat="server" ID="AutoTxt1" Text="" Value="0" TabIndex="2" RequiredFieldValidator="true"
+                                ValidationGroup="Submit" Width="150" Visible="false"/>
+                        </ContentTemplate>
+                    </asp:UpdatePanel>
+                </td>
+            </tr>
+            <tr style="background-color: #CCFFFF">
+                <td align="left" style="padding: 5px; font-family: Calibri">
+                    <asp:Label ID="label5" runat="server" Font-Size="Large" Text="Enter Ledger Account" />
+                </td>
+                <td align="left" style="padding: 5px; font-family: Calibri">
+                    <asp:UpdatePanel ID="UpdatePanel20" runat="server">
+                        <ContentTemplate>
+                            <Atxt:AutoTxt runat="server" ID="txtSearchState" Text="" Value="0" TabIndex="2" RequiredFieldValidator="true"
+                                ValidationGroup="Submit" Width="150" />
+                        </ContentTemplate>
+                    </asp:UpdatePanel>
+                </td>
+            </tr>
+            <tr style="background-color: #CCFFFF">
+                <td>
+                </td>
+                <td align="left" style="padding-right: 15px">
+                    <asp:UpdatePanel ID="UpdatePanel101" runat="server">
+                        <ContentTemplate>
+                            <asp:Button ID="btnEditContract" runat="server" Text="Edit" ValidationGroup="Find"
+                                CausesValidation="false" />
+                            <asp:Button ID="btn_close" runat="server" Text="Close" CausesValidation="false" />
+                        </ContentTemplate>
+                    </asp:UpdatePanel>
+                </td>
+            </tr>
+        </table>
+    </asp:Panel>
+    <div class="post">
+        <h2>
+            <span>Ledger Account</span> Master</h2>
+        <table class="myTable" style="width: 100%;" id="tblMain" runat="server">
+            <tr>
+                <td align="left">
+                    <asp:UpdatePanel ID="UpdatePanel6" runat="server">
+                        <ContentTemplate>
+                            <asp:Label ID="lblError" runat="server" Font-Bold="True" ForeColor="Red" Visible="False"></asp:Label>
+                        </ContentTemplate>
+                    </asp:UpdatePanel>
+                </td>
+            </tr>
+            <tr>
+                <td align="left">
+                    <table width="50%">
+                        <tr>
+                            <td style="width: 3%" align="center">
+                                <asp:UpdatePanel ID="UpdatePanel106" runat="server">
+                                    <ContentTemplate>
+                                        <asp:Button ID="btnUpdate" runat="server" CssClass="myButton" Height="36px" Text="Update"
+                                            Width="95%" ValidationGroup="Submit" />
+                                    </ContentTemplate>
+                                </asp:UpdatePanel>
+                            </td>
+                            <td style="width: 3%" align="center">
+                                <asp:UpdatePanel ID="UpdatePanel100" runat="server">
+                                    <ContentTemplate>
+                                        <asp:Button ID="btnFind" runat="server" CssClass="myButton" Height="36px" Text="Find"
+                                            Width="95%" CausesValidation="false" />
+                                        <cc1:ModalPopupExtender ID="btnFind_ModalPopupExtender" runat="server" DynamicServicePath=""
+                                            Enabled="True" TargetControlID="btnFind" PopupControlID="pnlFind" X="300" Y="200">
+                                        </cc1:ModalPopupExtender>
+                                    </ContentTemplate>
+                                </asp:UpdatePanel>
+                            </td>
+                            <td style="width: 3%" align="center">
+                                <asp:UpdatePanel ID="UpdatePanel1047" runat="server">
+                                    <ContentTemplate>
+                                        <asp:Button ID="btnInsert" runat="server" CssClass="myButton" Height="36px" Text="Insert"
+                                            Width="95%" ValidationGroup="Submit" />
+                                    </ContentTemplate>
+                                </asp:UpdatePanel>
+                            </td>
+                            <%--<td style="width: 3%" align="center">
+                                <asp:UpdatePanel ID="UpdatePanel108" runat="server">
+                                    <ContentTemplate>
+                                        <asp:Button ID="btn_copy" runat="server" CssClass="myButton" Height="36px" Text="Copy"
+                                            Width="95%" ValidationGroup="Submit" />
+                                    </ContentTemplate>
+                                </asp:UpdatePanel>
+                            </td>--%>
+                            <td style="width: 3%" align="center">
+                                <asp:UpdatePanel ID="UpdatePanel114" runat="server">
+                                    <ContentTemplate>
+                                        <asp:Button ID="btn_Clearall" runat="server" CssClass="myButton" Height="36px" Text="Clear All"
+                                            Width="95%" CausesValidation="false" />
+                                    </ContentTemplate>
+                                </asp:UpdatePanel>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td colspan="2">
+                                <asp:Label ID="Label1" runat="server" Font-Bold="True" ForeColor="Red" Visible="False"></asp:Label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                            </td>
+                            <td>
+                                <asp:DropDownList ID="drpSociety" runat="server" Width="187px" Visible="false">
+                                </asp:DropDownList>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Ledger Account Desc
+                            </td>
+                            <td>
+                                <asp:TextBox ID="txtLedgerAccountDesc" runat="server" Width="199px" AutoPostBack="true"
+                                    TabIndex="1"></asp:TextBox>*
+                                <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ErrorMessage="*"
+                                    ControlToValidate="txtLedgerAccountDesc" ValidationGroup="ValidateFrom" Font-Bold="true"
+                                    Font-Size="Large" ForeColor="Red"></asp:RequiredFieldValidator>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Is System Account
+                            </td>
+                            <td>
+                                <asp:CheckBox ID="chkIsSystemAccount" runat="server" TabIndex="2" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Is For PandL
+                            </td>
+                            <td>
+                                <asp:CheckBox ID="chk_IsForPandL" runat="server" TabIndex="3" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Is For BalanceSheet
+                            </td>
+                            <td>
+                                <asp:CheckBox ID="chk_IsForBalanceSheet" runat="server" TabIndex="4" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Is For Asset
+                            </td>
+                            <td>
+                                <asp:CheckBox ID="chk_IsForAsset" runat="server" TabIndex="5" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Is For Liabilities
+                            </td>
+                            <td>
+                                <asp:CheckBox ID="chk_IsForLiabilities" runat="server" TabIndex="6" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Is For Income
+                            </td>
+                            <td>
+                                <asp:CheckBox ID="chk_IsForIncome" runat="server" TabIndex="7" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Is For Expences
+                            </td>
+                            <td>
+                                <asp:CheckBox ID="chk_IsForExpences" runat="server" TabIndex="8" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="table-container">
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td align="left" valign="top">
+                                    <asp:UpdatePanel ID="UpdatePanel33" runat="server">
+                                        <ContentTemplate>
+                                            <asp:Label ID="lblmsg" runat="server" Font-Bold="True" ForeColor="Red" Visible="False"></asp:Label>
+                                        </ContentTemplate>
+                                    </asp:UpdatePanel>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="left" colspan="2" style="width: 50%; height: auto" valign="top">
+                                    <asp:GridView ID="gvGridView" runat="server" AllowPaging="true" AutoGenerateColumns="False"
+                                        CellPadding="4" CssClass="Gridview" DataKeyNames="Ldg_LedgerAccountId" ForeColor="#333333"
+                                        GridLines="None" Width="100%">
+                                        <RowStyle />
+                                        <Columns>
+                                            <asp:TemplateField ShowHeader="False">
+                                                <EditItemTemplate>
+                                                    <asp:LinkButton ID="lbUpdate" runat="server" CausesValidation="False" CommandName="Update"
+                                                        Text="Update"></asp:LinkButton>
+                                                    &nbsp; &nbsp; &nbsp;&nbsp;
+                                                    <asp:LinkButton ID="lbCancel" runat="server" CausesValidation="False" CommandName="Cancel"
+                                                        Text="Cancel"></asp:LinkButton>
+                                                </EditItemTemplate>
+                                                <ItemTemplate>
+                                                    <asp:LinkButton ID="lbEdit" runat="server" CausesValidation="False" CommandName="Edit"
+                                                        Text="Edit"></asp:LinkButton>
+                                                    &nbsp; &nbsp; &nbsp;&nbsp;
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField ShowHeader="False">
+                                                <ItemTemplate>
+                                                    <asp:LinkButton ID="lbDelete" runat="server" CausesValidation="False" CommandName="Delete"
+                                                        Text="Delete" Visible="true"></asp:LinkButton>
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="LedgerAccountId" Visible="False">
+                                                <ItemTemplate>
+                                                    <%#Eval("Ldg_LedgerAccountId")%>
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="LedgerAccount Desc">
+                                                <EditItemTemplate>
+                                                    <asp:TextBox ID="txtLedgerAccount" runat="server" Text='<%#Eval("Ldg_LedgerAccountDesc")%>'></asp:TextBox>
+                                                </EditItemTemplate>
+                                                <ItemTemplate>
+                                                    <%#Eval("Ldg_LedgerAccountDesc")%>
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="IsSystemAccount">
+                                                <ItemTemplate>
+                                                    <%#Eval("Ldg_IsSystemAccount")%>
+                                                </ItemTemplate>
+                                                <EditItemTemplate>
+                                                    <asp:CheckBox ID="chk_IsSystemAccount" runat="server" Checked=' <%#Eval("Ldg_IsSystemAccount")%>' />
+                                                </EditItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="IsForPandL">
+                                                <ItemTemplate>
+                                                    <%#Eval("Ldg_IsForPandL")%>
+                                                </ItemTemplate>
+                                                <EditItemTemplate>
+                                                    <asp:CheckBox ID="chk_IsForPandL" runat="server" Checked=' <%#Eval("Ldg_IsForPandLcheck")%>' />
+                                                </EditItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="IsForBalanceSheet">
+                                                <ItemTemplate>
+                                                    <%#Eval("Ldg_IsForBalanceSheet")%>
+                                                </ItemTemplate>
+                                                <EditItemTemplate>
+                                                    <asp:CheckBox ID="chk_IsForBalanceSheet" runat="server" Checked=' <%#Eval("Ldg_IsForBalanceSheetcheck")%>' />
+                                                </EditItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="IsForAsset">
+                                                <ItemTemplate>
+                                                    <%#Eval("Ldg_IsForAsset")%>
+                                                </ItemTemplate>
+                                                <EditItemTemplate>
+                                                    <asp:CheckBox ID="chk_IsForAsset" runat="server" Checked=' <%#Eval("Ldg_IsForAssetcheck")%>' />
+                                                </EditItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="IsForLiabilities">
+                                                <ItemTemplate>
+                                                    <%#Eval("Ldg_IsForLiabilities")%>
+                                                </ItemTemplate>
+                                                <EditItemTemplate>
+                                                    <asp:CheckBox ID="chk_IsForLiabilities" runat="server" Checked=' <%#Eval("Ldg_IsForLiabilitiescheck")%>' />
+                                                </EditItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="IsForIncome">
+                                                <ItemTemplate>
+                                                    <%#Eval("Ldg_IsForIncome")%>
+                                                </ItemTemplate>
+                                                <EditItemTemplate>
+                                                    <asp:CheckBox ID="chk_IsForIncome" runat="server" Checked=' <%#Eval("Ldg_IsForIncomecheck")%>' />
+                                                </EditItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="IsForExpences">
+                                                <ItemTemplate>
+                                                    <%#Eval("Ldg_IsForExpences")%>
+                                                </ItemTemplate>
+                                                <EditItemTemplate>
+                                                    <asp:CheckBox ID="chk_IsForExpences" runat="server" Checked=' <%#Eval("Ldg_IsForExpencescheck")%>' />
+                                                </EditItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Discontinued">
+                                                <ItemTemplate>
+                                                    <%#Eval("Ldg_Discontinued")%>
+                                                </ItemTemplate>
+                                                <EditItemTemplate>
+                                                    <asp:CheckBox ID="chk_Discontinued" runat="server" Checked=' <%#Eval("Ldg_Discontinuedcheck")%>' />
+                                                </EditItemTemplate>
+                                            </asp:TemplateField>
+                                        </Columns>
+                                        <FooterStyle />
+                                        <PagerStyle CssClass="pagination" />
+                                        <SelectedRowStyle />
+                                        <HeaderStyle />
+                                        <EditRowStyle />
+                                        <AlternatingRowStyle />
+                                    </asp:GridView>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</asp:Content>
